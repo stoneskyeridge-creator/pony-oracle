@@ -27,12 +27,62 @@ body{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env
 .music-controls button:focus-visible{outline:2px solid #ffe4a4;outline-offset:3px}
 .music-status{width:100%;margin:0;color:#e8c887}
 .music-status:empty{display:none}
+</style><style>
+.table-scene{isolation:isolate;position:relative;display:grid;place-items:center;width:min(940px,100%);min-height:350px;margin:0 auto 14px;overflow:hidden;border-radius:18px;background:#2f1a22;box-shadow:0 16px 48px #090609a0,inset 0 0 0 1px #e1b67b4f}
+.table-surface{position:absolute;z-index:-1;inset:0;background:#2f1a22 url("art/oracle-table.webp") center top/cover no-repeat;transform:scale(1);transform-origin:50% 23%;transition:transform .72s cubic-bezier(.2,.75,.2,1);pointer-events:none}
+.table-scene.is-shuffling .table-surface{transform:scale(1.045)}
+.table-scene.is-revealed .table-surface{transform:scale(1.17)}
+.table-scene .stage{grid-area:1/1;width:100%;outline:none}
+.table-scene #result{grid-area:1/1;min-width:0;width:100%}
+.table-scene .deck{filter:drop-shadow(5px 15px 8px #12090ace)}
+.table-scene .deck.shuffling{animation:table-riffle .56s ease-in-out both}
+.table-scene .shuffling .back{animation:none}
+@keyframes table-riffle{0%,100%{transform:none}25%{transform:translate(-16px,6px) rotate(-8deg)}68%{transform:translate(20px,-11px) rotate(10deg)}}
+.table-hoof{position:absolute;z-index:3;left:50%;top:0;width:clamp(112px,24vw,198px);pointer-events:none;opacity:0;transform:translate(68%,-97%) rotate(-25deg);transform-origin:50% 83%;transition:transform .25s ease,opacity .18s ease}
+.table-hoof img{display:block;width:100%;height:auto;filter:drop-shadow(9px 12px 10px #271122b0)}
+.is-dragging .table-hoof{opacity:1;transform:translate(calc(12% + var(--hoof-x,0px)),calc(-44% + var(--hoof-y,0px))) rotate(-26deg);transition:transform .13s ease,opacity .15s ease}
+.is-shuffling .table-hoof{animation:hoof-sweep .56s ease-in-out both}
+@keyframes hoof-sweep{0%{opacity:0;transform:translate(65%,-97%) rotate(-30deg)}22%{opacity:1;transform:translate(7%,-45%) rotate(-27deg)}62%{opacity:1;transform:translate(-30%,-39%) rotate(-18deg)}83%{opacity:1;transform:translate(25%,-51%) rotate(-30deg)}100%{opacity:0;transform:translate(67%,-97%) rotate(-34deg)}}
+.table-draw{display:grid;justify-items:center;position:relative;width:100%;min-height:350px;padding:24px 10px;perspective:1100px}
+.table-card{width:min(350px,83%);position:relative;align-self:center;transform:scale(.64) rotate(3deg);transform-origin:center;transition:transform .68s cubic-bezier(.2,.75,.22,1);filter:drop-shadow(5px 14px 10px #0b0408b8)}
+.table-card.is-landing{animation:table-land .56s cubic-bezier(.18,.72,.25,1) both}
+@keyframes table-land{0%{transform:translateY(-115px) scale(.86) rotate(-15deg);opacity:0}65%{transform:translateY(7px) scale(.64) rotate(6deg);opacity:1}100%{transform:translateY(0) scale(.64) rotate(3deg);opacity:1}}
+.table-card.is-flipped{transform:scale(1) rotate(0)}
+.table-turn{display:grid;transform-style:preserve-3d;transition:transform .66s cubic-bezier(.2,.73,.2,1)}
+.is-flipped .table-turn{transform:rotateY(180deg)}
+.table-turn-side{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.table-turn-back{background:url("art/card-back.png") center/contain no-repeat}
+.table-turn-front{transform:rotateY(180deg)}
+.table-turn .face{width:100%;margin:0;animation:none;box-shadow:none}
+.table-turn .card-reflection{display:none}
+.table-reading{width:min(350px,83%);align-self:start;margin:12px 0 0;padding:0 12px 4px;background:#190f1deb;border-radius:10px;color:#fff5dc}
+.table-reading p{font-size:14px;margin:9px 0}
+.table-reading b{color:#edcc90}
+@media(max-width:550px){
+ .table-scene{border-radius:12px}
+ .table-surface{background-position:center bottom}
+ .table-surface::after{content:"";position:absolute;inset:0 0 auto;aspect-ratio:3/2;background:url("art/oracle-table.webp") center/cover no-repeat;-webkit-mask-image:linear-gradient(#000 49%,transparent 100%);mask-image:linear-gradient(#000 49%,transparent 100%)}
+ .table-hoof{width:135px}
+ .table-card,.table-reading{width:min(350px,91%)}
+ .table-card,.table-card.is-landing{transform-origin:center top}
+}
+@media(max-height:690px){.table-scene,.table-draw{min-height:300px}}
+@media(prefers-reduced-motion:reduce){
+ .table-surface,.table-turn,.table-card,.table-hoof{transition:none!important}
+ .table-card.is-landing,.is-shuffling .table-hoof,.table-scene .deck.shuffling{animation:none!important}
+ .is-shuffling .table-hoof{opacity:1;transform:translate(7%,-43%) rotate(-25deg)}
+}
 </style></head><body><div class="sub">A FRIENDSHIP ORACLE</div><h1>Magic of Friendship</h1><div class="music-controls" role="group" aria-label="Background music">
   <button type="button" class="secondary" id="music-toggle">Play music</button>
   <button type="button" class="secondary" id="music-next" aria-label="Next music track"></button>
   <p class="small music-status" id="music-status" role="status"></p>
   <audio id="music-audio" preload="none" loop></audio>
-</div><p id="hint">Hold and move the deck to shuffle, then release to let a card fall.</p><main id="home"><div class="stage" id="stage"><div class="deck" id="deck"><div class="back">✧</div><div class="back">✧</div><div class="back">✦</div></div></div><div id="result"></div><div id="controls"><button id="shuffle">Shuffle & Drop</button><button id="flip" class="hidden">Turn Over Card</button><button id="next" class="hidden">Draw Another</button></div><p class="small" id="count"></p><button class="secondary" id="reset">Gather All Cards</button><button class="secondary" id="browse">Browse 44 Cards</button></main><section id="library" class="hidden"><button id="close">Return to Deck</button><div class="library" id="tiles"></div></section><p class="small">Unofficial fan-made oracle • For reflection and entertainment</p><script>const cards = [
+</div><p id="hint" role="status">Hold and move the deck to shuffle, then release to let a card fall.</p><main id="home"><div class="table-scene" id="table-scene">
+  <div class="table-surface" aria-hidden="true"></div>
+  <div class="stage" id="stage"><div class="deck" id="deck"><div class="back"></div><div class="back"></div><div class="back"></div></div></div>
+  <div id="result"></div>
+  <div class="table-hoof" aria-hidden="true"><img src="art/pony-hoof.webp" alt=""></div>
+</div><div id="controls"><button id="shuffle">Shuffle & Drop</button><button id="flip" class="hidden">Turn Over Card</button><button id="next" class="hidden">Draw Another</button></div><p class="small" id="count"></p><button class="secondary" id="reset">Gather All Cards</button><button class="secondary" id="browse">Browse 44 Cards</button></main><section id="library" class="hidden"><button id="close">Return to Deck</button><div class="library" id="tiles"></div></section><p class="small">Unofficial fan-made oracle • For reflection and entertainment</p><script>const cards = [
   {
     "name": "Twilight Sparkle",
     "theme": "Knowledge",
@@ -386,7 +436,78 @@ body{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env
     "image": "art/cards/44-derpy-hooves.webp"
   }
 ];
-let pile=[],current=null,busy=false,down=false,moves=0;const $=id=>document.getElementById(id);function mix(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}function reset(){if(busy)return;pile=cards.map((_,i)=>i);mix(pile);current=null;showDeck()}function count(){$('count').textContent=pile.length+' of 44 cards remain in the deck'}function showDeck(){$('stage').classList.remove('hidden');$('result').innerHTML='';$('shuffle').classList.remove('hidden');$('flip').classList.add('hidden');$('next').classList.add('hidden');$('shuffle').disabled=!pile.length;$('hint').textContent=pile.length?'Shuffle the deck and let a card find its way out.':'All 44 cards have been drawn. Gather them to begin again.';count()}function drop(){if(busy||!pile.length)return;busy=true;$('deck').classList.add('shuffling');setTimeout(()=>{$('deck').classList.remove('shuffling');mix(pile);current=pile.pop();$('deck').style.transform='';$('stage').classList.add('hidden');$('result').innerHTML='<div class="stage"><div class="deck fall"><div class="back">✦</div></div></div>';$('shuffle').classList.add('hidden');$('flip').classList.remove('hidden');$('hint').textContent='A card has fallen. Tap to reveal it.';count();busy=false},450)}function face(c){
+let pile=[],current=null,busy=false,down=false;const $=id=>document.getElementById(id);function mix(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}function reset(){if(busy)return;pile=cards.map((_,i)=>i);mix(pile);current=null;showDeck()}function count(){$('count').textContent=pile.length+' of 44 cards remain in the deck'}
+const table = $('table-scene');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let revealTimer;
+let readingTimer;
+
+function tableDuration(milliseconds) {
+  return reducedMotion.matches ? 0 : milliseconds;
+}
+
+function showDeck() {
+  clearTimeout(revealTimer);
+  clearTimeout(readingTimer);
+  table.classList.remove('is-revealed','is-dragging','is-shuffling');
+  $('stage').classList.remove('hidden');
+  $('result').innerHTML = '';
+  $('shuffle').classList.remove('hidden');
+  $('flip').classList.add('hidden');
+  $('next').classList.add('hidden');
+  $('shuffle').disabled = !pile.length;
+  setDeckHint();
+  count();
+}
+
+function setDeckHint() {
+  $('hint').textContent = pile.length
+    ? 'Move the deck with a touch or tap Shuffle & Drop.'
+    : 'All 44 cards have been drawn. Gather them to begin again.';
+}
+
+function drop() {
+  if (busy || !pile.length || $('stage').classList.contains('hidden')) return;
+  busy = true;
+  $('shuffle').disabled = true;
+  table.classList.remove('is-dragging');
+  table.classList.add('is-shuffling');
+  $('deck').style.transform = '';
+  $('deck').classList.add('shuffling');
+
+  setTimeout(() => {
+    table.classList.remove('is-shuffling');
+    $('deck').classList.remove('shuffling');
+    mix(pile);
+    current = pile.pop();
+    $('stage').classList.add('hidden');
+    $('shuffle').classList.add('hidden');
+    const card = cards[current];
+    $('result').innerHTML = `<div class="table-draw">
+      <div class="table-card is-landing">
+        <div class="table-turn">
+          <div class="table-turn-side table-turn-back" aria-hidden="true"></div>
+          <div class="table-turn-side table-turn-front" aria-hidden="true">${face(card, false)}</div>
+        </div>
+      </div>
+      <aside class="table-reading hidden">${reflection(card)}</aside>
+    </div>`;
+    $('hint').textContent = 'A card is landing on the table.';
+    count();
+    setTimeout(() => {
+      document.querySelector('.table-card').classList.remove('is-landing');
+      $('flip').classList.remove('hidden');
+      $('hint').textContent = 'Your card is turning over.';
+      revealTimer = setTimeout(flip, tableDuration(230));
+    }, tableDuration(560));
+  }, tableDuration(560));
+}
+
+function reflection(c) {
+  return `<p><b>Affirmation</b><br>${c.affirmation}</p>
+    <p><b>Reflect</b><br>${c.question}</p>`;
+}
+function face(c, includeReflection = true){
   return `<article class="face">
     <div class="card-art">
       <img src="${c.image}" alt="${c.name}" width="1024" height="1536">
@@ -396,13 +517,68 @@ let pile=[],current=null,busy=false,down=false,moves=0;const $=id=>document.getE
         <p>${c.meaning}</p>
       </div>
     </div>
-    <div class="card-reflection">
-      <p><b>Affirmation</b><br>${c.affirmation}</p>
-      <p><b>Reflect</b><br>${c.question}</p>
-    </div>
+    ${includeReflection ? `<div class="card-reflection">${reflection(c)}</div>` : ''}
   </article>`;
 }
-function flip(){$('result').innerHTML=face(cards[current]);$('flip').classList.add('hidden');$('next').classList.remove('hidden');$('hint').textContent='Your oracle card';} $('shuffle').onclick=drop;$('flip').onclick=flip;$('result').onclick=()=>{if(!$('flip').classList.contains('hidden'))flip()};$('next').onclick=showDeck;$('reset').onclick=reset;$('browse').onclick=()=>{$('home').classList.add('hidden');$('library').classList.remove('hidden');$('hint').textContent='Explore every card in the deck.';$('tiles').innerHTML=cards.map((c,i)=>`<button class="tile" data-i="${i}"><img src="${c.image}" alt="" loading="lazy" decoding="async" width="1024" height="1536"><b>${c.theme}</b><small>${c.name}</small></button>`).join('')};$('tiles').onclick=e=>{let b=e.target.closest('[data-i]');if(b){$('tiles').innerHTML=face(cards[+b.dataset.i])+'<button id="backlist">Back to All Cards</button>';$('backlist').onclick=$('browse').onclick}};$('close').onclick=()=>{$('home').classList.remove('hidden');$('library').classList.add('hidden');$('hint').textContent='Your oracle deck'};$('stage').onpointerdown=e=>{if(!pile.length)return;down=true;moves=0;$('stage').setPointerCapture(e.pointerId)};$('stage').onpointermove=e=>{if(down){moves++;$('deck').style.transform=`translate(${Math.sin(moves*.6)*18}px,${Math.cos(moves*.5)*7}px) rotate(${Math.sin(moves*.4)*12}deg)`}};$('stage').onpointerup=()=>{if(down){down=false;drop()}};$('stage').onpointercancel=()=>{down=false;$('deck').style.transform=''};reset();
+
+function flip() {
+  const card = $('result').querySelector('.table-card');
+  if (!card || card.classList.contains('is-landing') || card.classList.contains('is-flipped')) return;
+  clearTimeout(revealTimer);
+  $('flip').classList.add('hidden');
+  table.classList.add('is-revealed');
+  card.classList.add('is-flipped');
+  readingTimer = setTimeout(() => {
+    card.querySelector('.table-turn-front').removeAttribute('aria-hidden');
+    $('result').querySelector('.table-reading').classList.remove('hidden');
+    $('next').classList.remove('hidden');
+    if (!$('home').classList.contains('hidden')) $('hint').textContent = 'Your oracle card is face-up.';
+    busy = false;
+  }, tableDuration(680));
+}
+$('shuffle').onclick = drop;
+$('flip').onclick = flip;
+$('result').onclick = flip;
+$('next').onclick = showDeck;
+$('reset').onclick = reset;
+$('browse').onclick=()=>{$('home').classList.add('hidden');$('library').classList.remove('hidden');$('hint').textContent='Explore every card in the deck.';$('tiles').innerHTML=cards.map((c,i)=>`<button class="tile" data-i="${i}"><img src="${c.image}" alt="" loading="lazy" decoding="async" width="1024" height="1536"><b>${c.theme}</b><small>${c.name}</small></button>`).join('')};$('tiles').onclick=e=>{let b=e.target.closest('[data-i]');if(b){$('tiles').innerHTML=face(cards[+b.dataset.i])+'<button id="backlist">Back to All Cards</button>';$('backlist').onclick=$('browse').onclick}};
+$('close').onclick = () => {
+  $('home').classList.remove('hidden');
+  $('library').classList.add('hidden');
+  if (table.classList.contains('is-revealed')) $('hint').textContent = 'Your oracle card is face-up.';
+  else if (!busy) setDeckHint();
+};
+let dragStart;
+$('stage').onpointerdown = event => {
+  if (busy || !pile.length || !event.isPrimary) return;
+  down = true;
+  dragStart = {x:event.clientX, y:event.clientY};
+  table.style.setProperty('--hoof-x','0px');
+  table.style.setProperty('--hoof-y','0px');
+  table.classList.add('is-dragging');
+  $('stage').setPointerCapture(event.pointerId);
+};
+$('stage').onpointermove = event => {
+  if (!down || !event.isPrimary) return;
+  const x = Math.max(-30, Math.min(30, event.clientX - dragStart.x));
+  const y = Math.max(-18, Math.min(18, event.clientY - dragStart.y));
+  if (reducedMotion.matches) return;
+  $('deck').style.transform = `translate(${x}px,${y}px) rotate(${x/4}deg)`;
+  table.style.setProperty('--hoof-x', x + 'px');
+  table.style.setProperty('--hoof-y', y + 'px');
+};
+$('stage').onpointerup = event => {
+  if (!down || !event.isPrimary) return;
+  down = false;
+  drop();
+};
+$('stage').onpointercancel = () => {
+  down = false;
+  table.classList.remove('is-dragging');
+  $('deck').style.transform = '';
+};
+reset();
+
 const musicTracks = [{"title": "Moonlit Glade", "src": "music/moonlit-glade.mp3"}, {"title": "Starlight Music Box", "src": "music/starlight-music-box.mp3"}, {"title": "Cozy Cloud Lo-fi", "src": "music/cozy-cloud-lofi.mp3"}, {"title": "Canterlot After Dark", "src": "music/canterlot-after-dark.mp3"}];
 const musicAudio = $('music-audio');
 const musicToggle = $('music-toggle');
