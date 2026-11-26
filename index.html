@@ -17,7 +17,18 @@ button{min-height:44px;touch-action:manipulation}
 body{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:max(40px,env(safe-area-inset-bottom))}
 @media(max-height:690px){.stage{height:300px}.deck{width:160px;height:245px}}
 @media(prefers-reduced-motion:reduce){.face,.fall{animation:none!important}}
-</style></head><body><div class="sub">A FRIENDSHIP ORACLE</div><h1>Magic of Friendship</h1><p id="hint">Hold and move the deck to shuffle, then release to let a card fall.</p><main id="home"><div class="stage" id="stage"><div class="deck" id="deck"><div class="back">✧</div><div class="back">✧</div><div class="back">✦</div></div></div><div id="result"></div><div id="controls"><button id="shuffle">Shuffle & Drop</button><button id="flip" class="hidden">Turn Over Card</button><button id="next" class="hidden">Draw Another</button></div><p class="small" id="count"></p><button class="secondary" id="reset">Gather All Cards</button><button class="secondary" id="browse">Browse 44 Cards</button></main><section id="library" class="hidden"><button id="close">Return to Deck</button><div class="library" id="tiles"></div></section><p class="small">Unofficial fan-made oracle • For reflection and entertainment</p><script>const cards = [
+</style><style>
+.music-controls{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;margin:12px auto 4px}
+.music-controls button{margin:0;padding:10px 16px}
+.music-controls button:focus-visible{outline:2px solid #ffe4a4;outline-offset:3px}
+.music-status{width:100%;margin:0;color:#e8c887}
+.music-status:empty{display:none}
+</style></head><body><div class="sub">A FRIENDSHIP ORACLE</div><h1>Magic of Friendship</h1><div class="music-controls" role="group" aria-label="Background music">
+  <button type="button" class="secondary" id="music-toggle">Play music</button>
+  <button type="button" class="secondary" id="music-next" aria-label="Next music track"></button>
+  <p class="small music-status" id="music-status" role="status"></p>
+  <audio id="music-audio" preload="none" loop></audio>
+</div><p id="hint">Hold and move the deck to shuffle, then release to let a card fall.</p><main id="home"><div class="stage" id="stage"><div class="deck" id="deck"><div class="back">✧</div><div class="back">✧</div><div class="back">✦</div></div></div><div id="result"></div><div id="controls"><button id="shuffle">Shuffle & Drop</button><button id="flip" class="hidden">Turn Over Card</button><button id="next" class="hidden">Draw Another</button></div><p class="small" id="count"></p><button class="secondary" id="reset">Gather All Cards</button><button class="secondary" id="browse">Browse 44 Cards</button></main><section id="library" class="hidden"><button id="close">Return to Deck</button><div class="library" id="tiles"></div></section><p class="small">Unofficial fan-made oracle • For reflection and entertainment</p><script>const cards = [
   {
     "name": "Twilight Sparkle",
     "theme": "Knowledge",
@@ -387,4 +398,61 @@ let pile=[],current=null,busy=false,down=false,moves=0;const $=id=>document.getE
     </div>
   </article>`;
 }
-function flip(){$('result').innerHTML=face(cards[current]);$('flip').classList.add('hidden');$('next').classList.remove('hidden');$('hint').textContent='Your oracle card';} $('shuffle').onclick=drop;$('flip').onclick=flip;$('result').onclick=()=>{if(!$('flip').classList.contains('hidden'))flip()};$('next').onclick=showDeck;$('reset').onclick=reset;$('browse').onclick=()=>{$('home').classList.add('hidden');$('library').classList.remove('hidden');$('hint').textContent='Explore every card in the deck.';$('tiles').innerHTML=cards.map((c,i)=>`<button class="tile" data-i="${i}"><img src="${c.image}" alt="" loading="lazy" decoding="async" width="1024" height="1536"><b>${c.theme}</b><small>${c.name}</small></button>`).join('')};$('tiles').onclick=e=>{let b=e.target.closest('[data-i]');if(b){$('tiles').innerHTML=face(cards[+b.dataset.i])+'<button id="backlist">Back to All Cards</button>';$('backlist').onclick=$('browse').onclick}};$('close').onclick=()=>{$('home').classList.remove('hidden');$('library').classList.add('hidden');$('hint').textContent='Your oracle deck'};$('stage').onpointerdown=e=>{if(!pile.length)return;down=true;moves=0;$('stage').setPointerCapture(e.pointerId)};$('stage').onpointermove=e=>{if(down){moves++;$('deck').style.transform=`translate(${Math.sin(moves*.6)*18}px,${Math.cos(moves*.5)*7}px) rotate(${Math.sin(moves*.4)*12}deg)`}};$('stage').onpointerup=()=>{if(down){down=false;drop()}};$('stage').onpointercancel=()=>{down=false;$('deck').style.transform=''};reset();</script></body></html>
+function flip(){$('result').innerHTML=face(cards[current]);$('flip').classList.add('hidden');$('next').classList.remove('hidden');$('hint').textContent='Your oracle card';} $('shuffle').onclick=drop;$('flip').onclick=flip;$('result').onclick=()=>{if(!$('flip').classList.contains('hidden'))flip()};$('next').onclick=showDeck;$('reset').onclick=reset;$('browse').onclick=()=>{$('home').classList.add('hidden');$('library').classList.remove('hidden');$('hint').textContent='Explore every card in the deck.';$('tiles').innerHTML=cards.map((c,i)=>`<button class="tile" data-i="${i}"><img src="${c.image}" alt="" loading="lazy" decoding="async" width="1024" height="1536"><b>${c.theme}</b><small>${c.name}</small></button>`).join('')};$('tiles').onclick=e=>{let b=e.target.closest('[data-i]');if(b){$('tiles').innerHTML=face(cards[+b.dataset.i])+'<button id="backlist">Back to All Cards</button>';$('backlist').onclick=$('browse').onclick}};$('close').onclick=()=>{$('home').classList.remove('hidden');$('library').classList.add('hidden');$('hint').textContent='Your oracle deck'};$('stage').onpointerdown=e=>{if(!pile.length)return;down=true;moves=0;$('stage').setPointerCapture(e.pointerId)};$('stage').onpointermove=e=>{if(down){moves++;$('deck').style.transform=`translate(${Math.sin(moves*.6)*18}px,${Math.cos(moves*.5)*7}px) rotate(${Math.sin(moves*.4)*12}deg)`}};$('stage').onpointerup=()=>{if(down){down=false;drop()}};$('stage').onpointercancel=()=>{down=false;$('deck').style.transform=''};reset();
+const musicTracks = [{"title": "Moonlit Glade", "src": "music/moonlit-glade.mp3"}, {"title": "Starlight Music Box", "src": "music/starlight-music-box.mp3"}, {"title": "Cozy Cloud Lo-fi", "src": "music/cozy-cloud-lofi.mp3"}, {"title": "Canterlot After Dark", "src": "music/canterlot-after-dark.mp3"}];
+const musicAudio = $('music-audio');
+const musicToggle = $('music-toggle');
+const musicNext = $('music-next');
+const musicStatus = $('music-status');
+let musicIndex = 0;
+let musicRequested = false;
+let musicRequest = 0;
+
+function showMusicTrack() {
+  const title = musicTracks[musicIndex].title;
+  musicNext.textContent = title + ' ↻';
+  musicNext.setAttribute('aria-label', 'Next music track. Current track: ' + title);
+}
+
+function showMusicState(playing) {
+  musicRequested = playing;
+  musicToggle.textContent = playing ? 'Stop music' : 'Play music';
+}
+
+async function playMusic() {
+  const request = ++musicRequest;
+  const track = musicTracks[musicIndex];
+  musicStatus.textContent = '';
+  if (musicAudio.getAttribute('src') !== track.src) musicAudio.src = track.src;
+  showMusicState(true);
+  try {
+    await musicAudio.play();
+    if (request === musicRequest) musicStatus.textContent = 'Playing ' + track.title;
+  } catch {
+    if (request !== musicRequest) return;
+    showMusicState(false);
+    musicStatus.textContent = 'Music could not start. Tap Play to try again.';
+  }
+}
+
+musicToggle.addEventListener('click', () => {
+  if (!musicRequested) {
+    playMusic();
+    return;
+  }
+  ++musicRequest;
+  musicAudio.pause();
+  musicAudio.currentTime = 0;
+  showMusicState(false);
+  musicStatus.textContent = 'Music stopped';
+});
+
+musicNext.addEventListener('click', () => {
+  musicIndex = (musicIndex + 1) % musicTracks.length;
+  showMusicTrack();
+  if (musicRequested) playMusic();
+  else musicStatus.textContent = 'Selected ' + musicTracks[musicIndex].title;
+});
+
+showMusicTrack();
+</script></body></html>
